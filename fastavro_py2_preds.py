@@ -27,7 +27,7 @@ def generate_avro_schema():
     predictions = list(psPreds.find(q).limit(1))
     fields = []
     fields.append({
-        'name': 'PatientEvent',
+        'name': 'event_id',
         'type': 'string'})
     fields.append({
         'name': 'valid_on',
@@ -93,7 +93,7 @@ def to_avro(predictions):
     for i in predictions:
         data = {}
         time = to_timestamp(i['WCT'])
-        data['PatientEvent'] = str(i['_id'])
+        data['event_id'] = 'pred_' + str(i['_id'])
         data['valid_on'] = time
         data['created_on'] = time
         data['input_events'] = ''

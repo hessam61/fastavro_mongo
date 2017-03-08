@@ -29,7 +29,7 @@ def generate_avro_schema():
     fields = [{'name': key, 'type': ['float', 'null']}
         for key in predictions[0]['features'].keys()]
     fields.append({
-        'name': 'PatientEvent',
+        'name': 'event_id',
         'type': 'string'})
     fields.append({
         'name': 'valid_on',
@@ -76,15 +76,14 @@ def get_features(file_name, predictions):
         writer(out, schema, to_avro(predictions))
 
 def to_avro(predictions):
-    for i in predictions:
-        time = to_timestamp(i['WCT'])
-        data = {key: float(value) for key, value in i['features'].items()}
-        data['PatientEvent'] = str(i['_id'])
-        #print(type(str(i['_id'])))
+    for prediction in predictions:
+        time = to_timestamp(prediction['WCT'])
+        data = {key: float(value) for key, value in prediction['features'].items()}
+        data['event_id'] = str(prediction['_id'])
         data['valid_on'] = time
         data['created_on'] = time
         data['input_events'] = ''
-        data['patient_id'] = i['VISIT_NUMBER']
+        data['patient_id'] = prediction['VISIT_NUMBER']
         data['provenance'] = ['psPredsExtract', 'TransformSepsis']
         yield data
 
