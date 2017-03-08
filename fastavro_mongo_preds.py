@@ -68,7 +68,7 @@ def generate_avro_schema():
 
     return {
         'type': 'record',
-        'name': 'Transform',
+        'name': 'Predictions',
         'doc': 'The transform is either scalar or vector (array). The ' +
             'indices are held in key value pairs in the schema.  The types ' +
             'of the values are unique to the transform component.  ' +
