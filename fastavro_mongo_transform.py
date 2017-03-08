@@ -79,9 +79,9 @@ def to_avro(predictions):
     for prediction in predictions:
         data = {key: float(value) for key, value in prediction['features'].items()}
         data['event_id'] = str(prediction['_id'])
-        data['valid_on'] = int(i['WCT'].timestamp())
-        data['created_on'] = int(i['WCT'].timestamp())
-        data['input_events'] = ''
+        data['valid_on'] = int(prediction['WCT'].timestamp())
+        data['created_on'] = int(prediction['WCT'].timestamp())
+        data['input_events'] = str(prediction['_id'])
         data['patient_id'] = prediction['VISIT_NUMBER']
         data['provenance'] = ['psPredsExtract', 'TransformSepsis']
         yield data
