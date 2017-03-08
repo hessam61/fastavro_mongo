@@ -91,10 +91,9 @@ def get_features(file_name, predictions):
 def to_avro(predictions):
     for prediction in predictions:
         data = {}
-        time = to_timestamp(i['WCT'])
         data['event_id'] = 'pred_' + str(prediction['_id'])
-        data['valid_on'] = int(i['WCT'].timestamp())
-        data['created_on'] = int(i['WCT'].timestamp())
+        data['valid_on'] = int(prediction['WCT'].timestamp())
+        data['created_on'] = int(prediction['WCT'].timestamp())
         data['input_events'] = str(prediction['_id'])
         data['patient_id'] = prediction['VISIT_NUMBER']
         data['provenance'] = ['psPredsExtract', 'PredictSepsis']
