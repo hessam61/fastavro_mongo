@@ -3,13 +3,13 @@ and convert to avro files on HDFS using fastavro extension for hdfs
 '''
 from contextlib import contextmanager
 from collections import Counter
-
 from datetime import (
     datetime,
     timedelta)
 from os import (
     path,
     makedirs)
+from keyword import iskeyword
 from re import compile as re_compile
 from timeit import Timer
 from time import clock, mktime
@@ -198,7 +198,7 @@ if __name__=='__main__':
 
     for i in range(40):
         starttime = endtime - timedelta(1)
-        file_name = ''.join(('transforms/',
+        file_name = ''.join(('transforms_test/',
             starttime.strftime("%Y"), '/',
             starttime.strftime("%m"), '/',
             starttime.strftime("%Y_%m_%d"), '_transform.avro'))
