@@ -1,3 +1,6 @@
+'''This script exports data from a mongoDB, generates avro schema, normalized the Transform's features
+and convert to avro files on HDFS using fastavro extension for hdfs
+'''
 from contextlib import contextmanager
 from collections import Counter
 
@@ -25,6 +28,7 @@ is_authed = mongo_client.admin.authenticate(creds['user'],creds['pass'])
 
 psPreds = mongo_client.psPreds.preds
 
+# Generates avro schema from a simple query
 def generate_avro_schema(symbols=None):
     q = {'modelName':'sepsismodel_noEpoch'}
     predictions = list(psPreds.find(q).limit(1))
@@ -107,6 +111,7 @@ subs = {
 
 sub_keys = tuple(reversed(sorted(subs.keys())))
 
+# Performs normalization on returned key
 def to_symbol(old):
     new = old.lower().replace(' ', '_')
     for i in sub_keys:
@@ -122,7 +127,7 @@ def to_symbol(old):
         raise TypeError('%s is not a valid symbol for \'%s\'' % (new, old))
     return new
 
-
+# Query mongodb for a date range and get predictions
 def get_mongo_predictions(starttime, endtime, limit=None):
     q = {'modelName':'sepsismodel',
          'WCT':{'$gte':starttime,'$lt':endtime}}
@@ -130,7 +135,7 @@ def get_mongo_predictions(starttime, endtime, limit=None):
         '_id':1})
     return r if limit is None else r.limit(limit)
 
-
+# Write to avro file using fastavro
 def write_avro(file_name, predictions, symbols):
     avro_schema, symbols = generate_avro_schema(symbols)
     with AvroWriter(
@@ -149,7 +154,7 @@ def write_avro(file_name, predictions, symbols):
             data['provenance'] = ['psPredsExtract', 'TransformSepsis']
             writer.write(data)
 
-
+# Rename duplicate values since they cause conflicts in PySpark
 def rename_duplicates(symbols):
     deferred = symbols
     completed = {}
@@ -165,7 +170,7 @@ def rename_duplicates(symbols):
         i, suffix = i+1, '_v' + str(i)
     return completed
 
-
+# Change feature keys
 def rekey_features(symbols, features):
     keyed_predictions = {
         symbols[key]: value for key, value in features.items()}

@@ -1,3 +1,6 @@
+'''This script exports data from a mongoDB, generates avro schema,
+and converts Transform's features to avro files using fastavro writer
+'''
 from contextlib import contextmanager
 from datetime import (
     datetime,

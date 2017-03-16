@@ -1,3 +1,6 @@
+'''This script exports data from a mongoDB, generates avro schema, and stores predictions
+into HDFS as Avro files using fastavro extension for hdfs.
+'''
 from contextlib import contextmanager
 from datetime import (
     datetime,
