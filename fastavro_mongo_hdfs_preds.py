@@ -117,14 +117,14 @@ if __name__=='__main__':
     endtime = datetime.now()
     endtime = datetime(endtime.year,endtime.month,endtime.day)
 
-    for i in range(40):
+    for i in range(30):
         starttime = endtime - timedelta(1)
-        file_name = ''.join(('preds/',
+        file_name = ''.join(('predictions/',
             starttime.strftime("%Y"), '/',
             starttime.strftime("%m"), '/',
-            starttime.strftime("%Y_%m_%d"), '_transform.avro'))
+            starttime.strftime("%Y_%m_%d"), '_predict.avro'))
         with timer('Mongo: '):
-            predictions = list(get_mongo_predictions(starttime, endtime))
+            predictions = list(get_mongo_predictions(starttime, endtime, 10000))
         with timer('Avro:  '):
             write_avro(file_name, predictions)
         endtime=starttime
