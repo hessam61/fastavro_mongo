@@ -123,20 +123,18 @@ def write_avro(file_name, predictions, symbols):
 
 
 def rename_duplicates(symbols):
-    i = 0
     deferred = symbols
     completed = {}
-    #deferred = {key: to_symbol(key) for key in symbols.keys()}
+    i, suffix = 1, ''
     while deferred:
-        i += 1
         current, deferred = deferred, {}
         for key, value in current.items():
-            if value not in completed.values():
-                completed[key] = value
-            elif value + '_v' + str(i) not in completed.values():
-                completed[key] = value + '_v' + str(i)
-            else:
+            symbol = value + suffix
+            if symbol in completed.values():
                 deferred[key] = value
+            else:
+                completed[key] = symbol
+        i, suffix = i+1, '_v' + str(i)
     return completed
 
 
