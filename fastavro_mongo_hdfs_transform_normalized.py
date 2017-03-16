@@ -77,22 +77,50 @@ def generate_avro_schema(symbols=None):
     return schema, symbols
 
 
-#snakecase
-first_cap_re = re_compile('(.)([A-Z][a-z]+)')
-all_cap_re = re_compile('([a-z0-9])([A-Z])')
-subs = {
-    '(%)': '_pct_',
-    '_dot_': '.',
-    '(beats/min)': '_beats_',
-    ' >>> ': '_is_',
-    ' +++ ': '_derived_'}
+sub_res = (
+    (r'\1_\2', re_compile('(.)([A-Z][a-z]+)')), # first_cap
+    (r'\1_\2', re_compile('([a-z0-9])([A-Z])')), # all cap
+    (r'_', re_compile('(_+)')), # dunder
+    (r'\1', re_compile('^_(.*)')), # lead _
+    (r'\1', re_compile('(.*)_$'))) # trail _
 
-def to_symbol(key):
-    key = key.lower()
-    for pre, post in subs.items():
-        key = key.replace(pre, post)
-        new_key = first_cap_re.sub(r'\1_\2', key).replace(" ", "-")
-    return all_cap_re.sub(r'\1_\2', new_key)
+subs = {
+    '(' : '_lp_',
+    ')' : '_rp_',
+    '%' : '_pct_',
+    '\'' : '_squo_',
+    '[' : '_lb_',
+    ']' : '_rb_',
+    '.' : '_dot_',
+    '?' : '_question_',
+    ',' : '_comma_',
+    ':' : '_colon_',
+    ';' : '_semicolon_',
+    '*' : '_asterisk_',
+    '>>>': '_is_',
+    '+++': '_derived_',
+    '+' : '_plus_',
+    '-' : '_hyphen_',
+    '>' : '_gt_',
+    '<' : '_lt_',
+    '/' : '_slash_'}
+
+sub_keys = tuple(reversed(sorted(subs.keys())))
+
+def to_symbol(old):
+    new = old.lower().replace(' ', '_')
+    for i in sub_keys:
+        new = new.replace(i, subs[i])
+
+    for i, j in sub_res:
+        new = j.sub(i, new)
+
+    if iskeyword(new):
+        new = new + '_'
+
+    if not new.isidentifier():
+        raise TypeError('%s is not a valid symbol for \'%s\'' % (new, old))
+    return new
 
 
 def get_mongo_predictions(starttime, endtime, limit=None):
